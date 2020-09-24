@@ -9,6 +9,7 @@ import kz.bukenov.weather.R
 import kz.bukenov.weather.databinding.ActivityMainBinding
 import kz.bukenov.weather.ui.adapter.CitiesAdapter
 import kz.bukenov.weather.viewmodel.MainViewModel
+import java.util.concurrent.TimeUnit
 
 class MainActivity : BaseActivity() {
     private val viewModel: MainViewModel by viewModels()
@@ -30,11 +31,12 @@ class MainActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         addDisposable(
-            RxTextView.textChanges(input).subscribe {
-                if (it.length >= 2) {
+            RxTextView.textChanges(input)
+                .debounce(300, TimeUnit.MILLISECONDS)
+                .filter { it.length >= 2 }
+                .subscribe {
                     viewModel.findCities(it.toString())
                 }
-            }
         )
     }
 }
