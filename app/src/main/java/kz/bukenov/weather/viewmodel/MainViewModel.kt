@@ -13,6 +13,10 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 
 class MainViewModel(application: Application) : BaseViewModel(application) {
+    companion object {
+        private const val LIMIT = 3600000
+    }
+
     @Inject
     lateinit var cityRepository: CityRepository
 
@@ -20,6 +24,7 @@ class MainViewModel(application: Application) : BaseViewModel(application) {
     lateinit var weatherRepository: WeatherRepository
     val cities: LiveData<List<City>>
     private val scheduler: Scheduler
+    private var needUpdate = true
 
     init {
         (application as App).getDataComponent().inject(this)
@@ -41,14 +46,32 @@ class MainViewModel(application: Application) : BaseViewModel(application) {
         )
     }
 
+    fun updateData(cities: List<City>) {
+        if (needUpdate) {
+            needUpdate = false
+            val timestamp = System.currentTimeMillis()
+            cities.forEach { city ->
+                city.weatherTimestamp?.let {
+                    if (timestamp - it > LIMIT) {
+                        loadWeather(city)
+                    }
+                }
+            }
+        }
+    }
+
     private fun loadWeathers(cities: List<City>) {
         cities.forEach {
-            addDisposable(
-                weatherRepository.loadWeather(it.name)
-                    .subscribeOn(scheduler)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe()
-            )
+            loadWeather(it)
         }
+    }
+
+    private fun loadWeather(city: City) {
+        addDisposable(
+            weatherRepository.loadWeather(city.name)
+                .subscribeOn(scheduler)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe()
+        )
     }
 }

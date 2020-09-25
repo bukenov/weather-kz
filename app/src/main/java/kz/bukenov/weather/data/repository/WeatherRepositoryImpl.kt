@@ -13,7 +13,15 @@ class WeatherRepositoryImpl @Inject constructor(
     override fun loadWeather(cityName: String): Completable {
         return networkStore.getCurrentWeather(cityName)
             .flatMapCompletable {
-                cityDatabaseStore.update(City(cityName, it.low, it.high, it.text))
+                cityDatabaseStore.update(
+                    City(
+                        cityName,
+                        it.low,
+                        it.high,
+                        it.text,
+                        System.currentTimeMillis()
+                    )
+                )
             }
     }
 }

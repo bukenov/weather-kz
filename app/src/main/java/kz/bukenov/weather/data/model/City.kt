@@ -13,4 +13,5 @@ data class City(
     var weatherLow: Int? = null,
     var weatherHigh: Int? = null,
     var weatherText: String? = null,
+    var weatherTimestamp: Long? = null
 ) : Parcelable

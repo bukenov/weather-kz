@@ -25,6 +25,7 @@ class MainActivity : BaseActivity() {
         recyclerView.adapter = adapter
         viewModel.cities.observe(this, {
             adapter.updateItems(it)
+            viewModel.updateData(it)
         })
     }
 
