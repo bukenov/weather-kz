@@ -13,4 +13,8 @@ class RoomModule(application: Application) {
     @Provides
     @Singleton
     fun provideCityDao() = appDatabase.cityDao()
+
+    @Provides
+    @Singleton
+    fun provideInputDao() = appDatabase.inputDao()
 }

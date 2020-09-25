@@ -5,10 +5,12 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import kz.bukenov.weather.data.model.City
+import kz.bukenov.weather.data.model.Input
 
-@Database(entities = [City::class], version = 1, exportSchema = false)
+@Database(entities = [City::class, Input::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun cityDao(): CityDao
+    abstract fun inputDao(): InputDao
 
     companion object {
         private var INSTANCE: AppDatabase? = null

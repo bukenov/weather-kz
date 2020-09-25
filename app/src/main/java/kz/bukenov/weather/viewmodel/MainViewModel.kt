@@ -2,12 +2,15 @@ package kz.bukenov.weather.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kz.bukenov.weather.App
 import kz.bukenov.weather.data.model.City
 import kz.bukenov.weather.data.repository.CityRepository
+import kz.bukenov.weather.data.repository.InputRepository
 import kz.bukenov.weather.data.repository.WeatherRepository
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -22,7 +25,11 @@ class MainViewModel(application: Application) : BaseViewModel(application) {
 
     @Inject
     lateinit var weatherRepository: WeatherRepository
+
+    @Inject
+    lateinit var inputRepository: InputRepository
     val cities: LiveData<List<City>>
+    val initInput: MutableLiveData<String> = MutableLiveData()
     private val scheduler: Scheduler
     private var needUpdate = true
 
@@ -32,12 +39,14 @@ class MainViewModel(application: Application) : BaseViewModel(application) {
         // for test use 2 pool size
         val executor = Executors.newFixedThreadPool(2)
         scheduler = Schedulers.from(executor)
+        initInput()
     }
 
     fun findCities(input: String) {
         clearDisposables()
         addDisposable(
             cityRepository.loadCities(input)
+                .flatMap { inputRepository.saveInput(input).andThen(Observable.just(it)) }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -60,6 +69,17 @@ class MainViewModel(application: Application) : BaseViewModel(application) {
                 }
             }
         }
+    }
+
+    private fun initInput() {
+        addDisposable(
+            inputRepository.getInput()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    initInput.value = it
+                }
+        )
     }
 
     private fun loadWeathers(cities: List<City>) {

@@ -27,6 +27,11 @@ class MainActivity : BaseActivity() {
             adapter.updateItems(it)
             viewModel.updateData(it)
         })
+        viewModel.initInput.observe(this, {
+            if (!it.isNullOrEmpty() && input.text.isEmpty()) {
+                input.setText(it)
+            }
+        })
     }
 
     override fun onResume() {
@@ -34,7 +39,7 @@ class MainActivity : BaseActivity() {
         addDisposable(
             RxTextView.textChanges(input)
                 .debounce(300, TimeUnit.MILLISECONDS)
-                .filter { it.length >= 2 }
+                .filter { it.length >= 2 && input.hasFocus() }
                 .subscribe {
                     viewModel.findCities(it.toString())
                 }
