@@ -3,15 +3,15 @@ package kz.bukenov.weather.viewmodel
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kz.bukenov.weather.App
 import kz.bukenov.weather.data.model.City
-import kz.bukenov.weather.data.repository.CityRepository
-import kz.bukenov.weather.data.repository.InputRepository
-import kz.bukenov.weather.data.repository.WeatherRepository
+import kz.bukenov.weather.domain.GetCitiesUseCase
+import kz.bukenov.weather.domain.GetInputUseCase
+import kz.bukenov.weather.domain.LoadCitiesUseCase
+import kz.bukenov.weather.domain.LoadWeatherUseCase
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
@@ -21,13 +21,16 @@ class MainViewModel(application: Application) : BaseViewModel(application) {
     }
 
     @Inject
-    lateinit var cityRepository: CityRepository
+    lateinit var getCitiesUseCase: GetCitiesUseCase
 
     @Inject
-    lateinit var weatherRepository: WeatherRepository
+    lateinit var loadCitiesUseCase: LoadCitiesUseCase
 
     @Inject
-    lateinit var inputRepository: InputRepository
+    lateinit var loadWeatherUseCase: LoadWeatherUseCase
+
+    @Inject
+    lateinit var getInputUseCase: GetInputUseCase
     val cities: LiveData<List<City>>
     val initInput: MutableLiveData<String> = MutableLiveData()
     private val scheduler: Scheduler
@@ -35,7 +38,7 @@ class MainViewModel(application: Application) : BaseViewModel(application) {
 
     init {
         (application as App).getDataComponent().inject(this)
-        cities = cityRepository.getCities()
+        cities = getCitiesUseCase.invoke()
         // for test use 2 pool size
         val executor = Executors.newFixedThreadPool(2)
         scheduler = Schedulers.from(executor)
@@ -45,8 +48,7 @@ class MainViewModel(application: Application) : BaseViewModel(application) {
     fun findCities(input: String) {
         clearDisposables()
         addDisposable(
-            cityRepository.loadCities(input)
-                .flatMap { inputRepository.saveInput(input).andThen(Observable.just(it)) }
+            loadCitiesUseCase.invoke(input)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -73,7 +75,7 @@ class MainViewModel(application: Application) : BaseViewModel(application) {
 
     private fun initInput() {
         addDisposable(
-            inputRepository.getInput()
+            getInputUseCase.invoke()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -90,7 +92,7 @@ class MainViewModel(application: Application) : BaseViewModel(application) {
 
     private fun loadWeather(city: City) {
         addDisposable(
-            weatherRepository.loadWeather(city.name)
+            loadWeatherUseCase.invoke(city)
                 .subscribeOn(scheduler)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
