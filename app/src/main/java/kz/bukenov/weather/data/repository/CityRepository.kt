@@ -1,8 +1,11 @@
 package kz.bukenov.weather.data.repository
 
-import io.reactivex.Flowable
+import androidx.lifecycle.LiveData
+import io.reactivex.Completable
 import kz.bukenov.weather.data.model.City
 
 interface CityRepository {
-    fun getCities(input: String): Flowable<List<City>>
+    fun getCities(): LiveData<List<City>>
+
+    fun loadCities(input: String): Completable
 }

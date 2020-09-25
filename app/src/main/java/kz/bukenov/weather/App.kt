@@ -6,6 +6,7 @@ import kz.bukenov.weather.di.component.DaggerApplicationComponent
 import kz.bukenov.weather.di.component.DataComponent
 import kz.bukenov.weather.di.component.NetworkComponent
 import kz.bukenov.weather.di.module.ApplicationModule
+import kz.bukenov.weather.di.module.RoomModule
 
 class App : Application() {
     private lateinit var applicationComponent: ApplicationComponent
@@ -16,6 +17,7 @@ class App : Application() {
         super.onCreate()
         applicationComponent = DaggerApplicationComponent.builder()
             .applicationModule(ApplicationModule(this))
+            .roomModule(RoomModule(this))
             .build()
     }
 

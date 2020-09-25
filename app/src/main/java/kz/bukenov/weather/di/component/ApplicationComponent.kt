@@ -4,10 +4,11 @@ import android.content.Context
 import dagger.Component
 import kz.bukenov.weather.App
 import kz.bukenov.weather.di.module.ApplicationModule
+import kz.bukenov.weather.di.module.RoomModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [ApplicationModule::class])
+@Component(modules = [ApplicationModule::class, RoomModule::class])
 interface ApplicationComponent {
     fun context(): Context
 
