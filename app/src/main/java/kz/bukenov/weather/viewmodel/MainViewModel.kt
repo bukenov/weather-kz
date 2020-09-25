@@ -29,11 +29,13 @@ class MainViewModel(application: Application) : BaseViewModel(application) {
     init {
         (application as App).getDataComponent().inject(this)
         cities = cityRepository.getCities()
+        // for test use 2 pool size
         val executor = Executors.newFixedThreadPool(2)
         scheduler = Schedulers.from(executor)
     }
 
     fun findCities(input: String) {
+        clearDisposables()
         addDisposable(
             cityRepository.loadCities(input)
                 .subscribeOn(Schedulers.io())
@@ -71,7 +73,10 @@ class MainViewModel(application: Application) : BaseViewModel(application) {
             weatherRepository.loadWeather(city.name)
                 .subscribeOn(scheduler)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe()
+                .subscribe({
+                }, {
+                    it.printStackTrace()
+                })
         )
     }
 }

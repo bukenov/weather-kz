@@ -9,11 +9,15 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
     private val disposables = CompositeDisposable()
 
     override fun onCleared() {
-        disposables.clear()
+        clearDisposables()
         super.onCleared()
     }
 
     protected fun addDisposable(disposable: Disposable) {
         disposables.add(disposable)
+    }
+
+    protected fun clearDisposables() {
+        disposables.clear()
     }
 }
