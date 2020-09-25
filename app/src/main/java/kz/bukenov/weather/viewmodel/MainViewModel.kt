@@ -7,11 +7,15 @@ import io.reactivex.schedulers.Schedulers
 import kz.bukenov.weather.App
 import kz.bukenov.weather.data.model.City
 import kz.bukenov.weather.data.repository.CityRepository
+import kz.bukenov.weather.data.repository.WeatherRepository
 import javax.inject.Inject
 
 class MainViewModel(application: Application) : BaseViewModel(application) {
     @Inject
     lateinit var cityRepository: CityRepository
+
+    @Inject
+    lateinit var weatherRepository: WeatherRepository
     val cities: LiveData<List<City>>
 
     init {
@@ -25,9 +29,21 @@ class MainViewModel(application: Application) : BaseViewModel(application) {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+                    loadWeathers(it)
                 }, {
                     it.printStackTrace()
                 })
         )
+    }
+
+    private fun loadWeathers(cities: List<City>) {
+        cities.forEach {
+            addDisposable(
+                weatherRepository.loadWeather(it.name)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe()
+            )
+        }
     }
 }

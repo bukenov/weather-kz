@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -9,18 +10,64 @@
             type="kz.bukenov.weather.data.model.City" />
     </data>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp">
 
         <TextView
+            android:id="@+id/txtHigh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@{city.weatherHigh != null ? String.valueOf(city.weatherHigh) : ``}"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toTopOf="@id/txtLow"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="9" />
+
+        <TextView
+            android:id="@+id/txtLow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{city.weatherLow != null ? String.valueOf(city.weatherLow) : ``}"
+            android:textColor="@color/grey600"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtHigh"
+            tools:text="-2" />
+
+        <TextView
+            android:id="@+id/txtWeather"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="36dp"
+            android:text="@{city.weatherText}"
+            android:textColor="@color/grey600"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Scattered Showers" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:lines="1"
             android:text="@{city.name}"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/txtWeather"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Астана" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

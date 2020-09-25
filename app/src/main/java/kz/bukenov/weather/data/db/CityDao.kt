@@ -1,9 +1,7 @@
 package kz.bukenov.weather.data.db
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import io.reactivex.Completable
 import kz.bukenov.weather.data.model.City
 
@@ -17,4 +15,7 @@ interface CityDao {
 
     @Query("DELETE FROM City")
     fun deleteAll(): Completable
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    fun update(city: City): Completable
 }

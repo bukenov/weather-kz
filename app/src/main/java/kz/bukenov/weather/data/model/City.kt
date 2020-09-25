@@ -12,5 +12,5 @@ data class City(
     val name: String,
     var weatherLow: Int? = null,
     var weatherHigh: Int? = null,
-    var weatherText: Int? = null,
+    var weatherText: String? = null,
 ) : Parcelable

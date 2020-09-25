@@ -1,6 +1,7 @@
 package kz.bukenov.weather.data.repository
 
-import io.reactivex.Completable
+import io.reactivex.Observable
+import kz.bukenov.weather.data.model.City
 import kz.bukenov.weather.data.repository.datastore.CityDatabaseStore
 import kz.bukenov.weather.data.repository.datastore.CityNetworkStore
 import javax.inject.Inject
@@ -11,10 +12,11 @@ class CityRepositoryImpl @Inject constructor(
 ) : CityRepository {
     override fun getCities() = databaseStore.getCities()
 
-    override fun loadCities(input: String): Completable {
+    override fun loadCities(input: String): Observable<List<City>> {
         return networkStore.getCities(input)
-            .flatMapCompletable {
+            .flatMap {
                 databaseStore.saveCities(it)
+                    .andThen(Observable.just(it))
             }
     }
 }

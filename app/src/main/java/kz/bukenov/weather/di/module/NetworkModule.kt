@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
+import kz.bukenov.weather.data.network.interceptor.OAuth1Interceptor
 import kz.bukenov.weather.di.scope.AppScope
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -38,21 +39,24 @@ class NetworkModule {
     @Provides
     @AppScope
     @Named("places")
-    fun providePlacesRetrofit(client: OkHttpClient, gson: Gson): Retrofit {
+    fun providePlacesRetrofit(httpClient: OkHttpClient, gson: Gson): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://maps.googleapis.com")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .client(client)
+            .client(httpClient)
             .build()
     }
 
     @Provides
     @AppScope
     @Named("weather")
-    fun provideWeatherRetrofit(client: OkHttpClient, gson: Gson): Retrofit {
+    fun provideWeatherRetrofit(httpClient: OkHttpClient, gson: Gson): Retrofit {
+        val client = httpClient.newBuilder()
+            .addInterceptor(OAuth1Interceptor())
+            .build()
         return Retrofit.Builder()
-            .baseUrl("http://api.openweathermap.org")
+            .baseUrl("https://weather-ydn-yql.media.yahoo.com")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .client(client)

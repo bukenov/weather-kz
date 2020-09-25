@@ -1,6 +1,6 @@
 package kz.bukenov.weather.data.network
 
-import io.reactivex.Flowable
+import io.reactivex.Observable
 import kz.bukenov.weather.data.network.response.PlacesResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -10,5 +10,5 @@ interface PlacesApi {
     fun getAutocomplete(
         @Query("input") input: String,
         @Query("key") key: String
-    ): Flowable<PlacesResponse>
+    ): Observable<PlacesResponse>
 }
